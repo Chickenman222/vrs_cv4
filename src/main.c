@@ -47,23 +47,27 @@ SOFTWARE.
 **===========================================================================
 */
 uint32_t AD_value = 0;
+#define sleep1 500000
+#define sleep2 750000
+#define sleep3 1000000
+#define sleep4 1250000
 
-uint64_t change_blinking_frequency(){
+
+void change_blinking_frequency(){
 
 	  ADC_SoftwareStartConv(ADC1);
 	  while(!ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC)){}
 	  AD_value=ADC_GetConversionValue(ADC1);
 
 	  if(AD_value > 3600 && AD_value < 3700)
-		  return 500000;
+		  for(int i = 0; i<=sleep1;i++);
 	  else if(AD_value > 3400 && AD_value < 3500)
-		  return 750000;
+		  for(int i = 0; i<=sleep2;i++);
 	  else if(AD_value > 2820 && AD_value < 2930)
-		  return 1000000;
+		  for(int i = 0; i<=sleep3;i++);
 	  else if(AD_value > 1950 && AD_value < 2050)
-		  return 1250000;
-	  else
-		  return 0;
+		  for(int i = 0; i<=sleep4;i++);
+	  else{}
 }
 
 void led_init(void){
@@ -147,12 +151,7 @@ int main(void)
   /* Infinite loop */
   while (1)
   {
-	  ADC_SoftwareStartConv(ADC1);
-	  while(!ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC)){}
-	  AD_value=ADC_GetConversionValue(ADC1);
-
-	  for(int i = 0; i<=change_blinking_frequency();i++);
-
+	  change_blinking_frequency();
 	  GPIO_ToggleBits(GPIOA,GPIO_Pin_5);
   }
   return 0;
