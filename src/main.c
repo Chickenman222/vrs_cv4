@@ -46,6 +46,39 @@ SOFTWARE.
 **
 **===========================================================================
 */
+uint32_t AD_value = 0;
+
+uint64_t change_blinking_frequency(){
+
+	  ADC_SoftwareStartConv(ADC1);
+	  while(!ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC)){}
+	  AD_value=ADC_GetConversionValue(ADC1);
+
+	  if(AD_value > 3600 && AD_value < 3700)
+		  return 500000;
+	  else if(AD_value > 3400 && AD_value < 3500)
+		  return 750000;
+	  else if(AD_value > 2820 && AD_value < 2930)
+		  return 1000000;
+	  else if(AD_value > 1950 && AD_value < 2050)
+		  return 1250000;
+	  else
+		  return 0;
+}
+
+void led_init(void){
+
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
+
+	GPIO_InitTypeDef GPIO_LED;
+	GPIO_LED.GPIO_Pin = GPIO_Pin_5;
+	GPIO_LED.GPIO_Mode = GPIO_Mode_OUT;
+	GPIO_LED.GPIO_OType = GPIO_OType_PP;
+	GPIO_LED.GPIO_PuPd = GPIO_PuPd_UP;
+	GPIO_LED.GPIO_Speed = GPIO_Speed_40MHz;
+	GPIO_Init(GPIOA,&GPIO_LED);
+}
+
 void adc_init(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
@@ -83,10 +116,13 @@ void adc_init(void)
 	/* Start ADC Software Conversion */
 	//ADC_SoftwareStartConv(ADC1);
 }
+
 int main(void)
 {
-	uint32_t AD_value = 0;
+	int i;
+	uint32_t real_value;
 	adc_init();
+	led_init();
 
   /**
   *  IMPORTANT NOTE!
@@ -114,6 +150,10 @@ int main(void)
 	  ADC_SoftwareStartConv(ADC1);
 	  while(!ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC)){}
 	  AD_value=ADC_GetConversionValue(ADC1);
+
+	  for(int i = 0; i<=change_blinking_frequency();i++);
+
+	  GPIO_ToggleBits(GPIOA,GPIO_Pin_5);
   }
   return 0;
 }
